@@ -1,0 +1,64 @@
+services:
+  - type: web
+    name: simstudio
+    env: docker
+    region: oregon # optional (defaults to oregon)
+    plan: standard # optional (defaults to starter)
+    branch: main # optional (defaults to master)
+    numInstances: 1
+    healthCheckPath: /
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: simstudio-db
+          property: connectionString
+      - key: BETTER_AUTH_SECRET
+        generateValue: true
+      - key: BETTER_AUTH_URL
+        value: https://your-simstudio-app.onrender.com
+      - key: WEBHOOK_URL
+        value: https://your-simstudio-app.onrender.com/
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: NEXTAUTH_URL
+        value: https://your-simstudio-app.onrender.com
+      - key: OPENAI_API_KEY
+        sync: false # Prompt for value in Render Dashboard
+      - key: ANTHROPIC_API_KEY
+        sync: false # Prompt for value in Render Dashboard
+      - key: GOOGLE_API_KEY
+        sync: false # Prompt for value in Render Dashboard
+      - key: DISABLE_REGISTRATION
+        value: "false"
+    disk:
+      name: simstudio-disk
+      mountPath: /app/data
+      sizeGB: 5
+
+  - type: pserv
+    name: realtime-server
+    env: docker
+    region: oregon
+    plan: starter
+    branch: main
+    dockerfilePath: ./Dockerfile.realtime
+    dockerContext: ./
+    envVars:
+      - key: PORT
+        value: 3001
+      - key: NODE_ENV
+        value: production
+      - fromService:
+          name: simstudio-db
+          type: postgres
+          envVarKey: DATABASE_URL
+
+databases:
+  - name: simstudio-db
+    plan: basic-1gb
+    databaseName: simstudio
+    user: simstudio_user

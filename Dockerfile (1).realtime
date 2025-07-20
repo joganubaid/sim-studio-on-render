@@ -1,0 +1,32 @@
+FROM node:20-alpine AS base
+
+# Install system dependencies
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Install dependencies
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
+RUN \
+  if [ -f yarn.lock ]; then yarn --frozen-lockfile --production; \
+  elif [ -f package-lock.json ]; then npm ci --only=production; \
+  elif [ -f pnpm-lock.yaml ]; then npm install -g pnpm && pnpm i --frozen-lockfile --prod; \
+  else echo "Lockfile not found." && exit 1; \
+  fi
+
+# Copy application files
+COPY . .
+
+# Build the realtime server if needed
+RUN \
+  if [ -f yarn.lock ]; then yarn build:realtime; \
+  elif [ -f package-lock.json ]; then npm run build:realtime; \
+  elif [ -f pnpm-lock.yaml ]; then pnpm run build:realtime; \
+  else echo "Starting realtime server"; \
+  fi
+
+EXPOSE 3001
+
+ENV NODE_ENV=production
+ENV PORT=3001
+
+CMD ["node", "apps/realtime/dist/index.js"]

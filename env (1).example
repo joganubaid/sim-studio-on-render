@@ -1,0 +1,25 @@
+# Database
+DATABASE_URL=postgresql://username:password@localhost:5432/simstudio
+
+# Authentication
+BETTER_AUTH_SECRET=your-super-secret-key-here
+BETTER_AUTH_URL=http://localhost:3000
+NEXTAUTH_URL=http://localhost:3000
+
+# Application
+NODE_ENV=development
+PORT=3000
+WEBHOOK_URL=http://localhost:3000/
+
+# AI API Keys (Optional - Add your API keys)
+OPENAI_API_KEY=your-openai-api-key
+ANTHROPIC_API_KEY=your-anthropic-api-key
+GOOGLE_API_KEY=your-google-api-key
+DEEPSEEK_API_KEY=your-deepseek-api-key
+
+# Features
+DISABLE_REGISTRATION=false
+NEXT_TELEMETRY_DISABLED=1
+
+# Realtime Server
+REALTIME_PORT=3001
